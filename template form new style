@@ -1,0 +1,33 @@
+#how to style forms (remove label and add placeholder)
+#documentation
+https://docs.djangoproject.com/en/4.2/howto/custom-template-tags/
+
+
+1. create a templatetags folder in app_name(like templates)
+2. inside templatetags folder create a file form_filters.py
+3. inside form_filters.py add this code:
+
+from django import template
+register = template.Library()
+
+@register.filter
+def add_placeholder(form):
+    for field in form:
+        field.field.widget.attrs.update({'placeholder': field.label})
+    return form
+
+@register.filter
+def remove_label(form):
+    for field in form:
+        field.label = ''
+    return form
+ 
+4. add to settings new app:
+'app_name.templatetags.form_filters',
+
+5. in template add code:
+{% load form_filters %}
+
+{{form | add_placeholder | remove_label}}
+
+
