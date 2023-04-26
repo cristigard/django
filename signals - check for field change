@@ -1,0 +1,23 @@
+1.#create signals.py in app_name folder
+  #add thos code
+
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from .models import Ticket
+
+@receiver(pre_save, sender=Ticket)
+def on_change(sender, instance, **kwargs):
+	ticket = Ticket.objects.get(pk=instance.pk)
+	print(ticket.state) <- old field value
+	print(instance.state) <- new field value
+
+2.#add ready function in apps.py (app_name folder)
+
+from django.apps import AppConfig
+
+class TicketsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'app_name'
+
+    def ready(self):
+        import app_name.signals
