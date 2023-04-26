@@ -1,2 +1,5 @@
+#settings
 STATIC_URL = '/static/' <- correct
 STATIC_URL = 'static/' <- incorrect
+
+#add static folder in app_name folder(like templates)
