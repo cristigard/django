@@ -1,3 +1,6 @@
+#standard django authenticate 
+https://github.com/django/django/blob/main/django/contrib/auth/backends.py
+
 #custom password login authentication
 
 1.insert code to app_name(accounts) models.py file:
