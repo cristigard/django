@@ -1,5 +1,5 @@
 1.#create signals.py in app_name folder
-  #add thos code
+#add this code
 
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
