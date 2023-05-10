@@ -1,0 +1,10 @@
+#get pk in class based view
+class WaitTicket(CreateView):
+    model = Wait
+    form_class = WaitForm
+    template_name = 'tickets/wait_ticket.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pk'] = self.kwargs['pk']
+        return context
