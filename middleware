@@ -1,0 +1,41 @@
+#https://docs.djangoproject.com/en/4.2/topics/http/middleware/#view-middleware
+#https://www.youtube.com/watch?v=EpZOVmEw9Qg
+
+Django request/response process:
+request from browser -> middleware -> view -> middleware -> response to browser 
+
+#how to use middleware
+1. create a file in app_name 'middleware.py' <- or other name
+
+2a. add this function in middleware.py for function based:
+def simple_middleware(get_response):
+    # One-time configuration and initialization.
+    def middleware(request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+        response = get_response(request)
+        # Code to be executed for each request/response after
+        # the view is called.
+        return response
+    return middleware
+    
+2b. or add this class in middleware.py for class based
+class SimpleMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # One-time configuration and initialization.
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+        response = self.get_response(request)
+        # Code to be executed for each request/response after
+        # the view is called.
+        return response
+        
+3a. add to settings.py middleware list (add last middleware in list!!!):
+'app_name.middleware.simple_middleware' <- function based
+ 
+3b. add to settings.py middleware list (add last middleware in list!!!):
+'app_name.middleware.SimpleMiddleware' <- class based
+
+Every time a request come from browser will execute simple_middleware or SimpleMiddleware
