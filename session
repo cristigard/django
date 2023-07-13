@@ -1,0 +1,8 @@
+#add an empty listv or dict to session dict
+request.session['test'] = []
+
+#when modify that list or dict 
+request.session['test'].append('2')
+
+#dont forget to save because django dont know if the list or dict was modiffied
+request.session.modified = True
