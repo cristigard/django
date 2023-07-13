@@ -1,8 +1,20 @@
-#add an empty listv or dict to session dict
+#get user id from cookie (sessionid)
+def test(request):
+    id = request.COOKIES.get('sessionid')
+    session = SessionStore(session_key=id)
+    session_data = session.load()
+    user_id = session_data.get('_auth_user_id')
+    print(user_id)
+    return render(request, 'test.html')
+
+----------
+
+#add data to session
+#add an empty list or dict to session dict
 request.session['test'] = []
 
 #when modify that list or dict 
 request.session['test'].append('2')
 
-#dont forget to save because django dont know if the list or dict was modiffied
+#dont forget to save because django dont know if the list or dict was modified
 request.session.modified = True
