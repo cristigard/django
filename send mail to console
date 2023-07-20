@@ -1,0 +1,4 @@
+#Send mail in console
+
+#add in settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
