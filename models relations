@@ -1,0 +1,6 @@
+#ManyToMany
+https://www.sankalpjonna.com/learn-django/the-right-way-to-use-a-manytomanyfield-in-django
+
+#ForeignKey
+You can set default value for foreign key, if not supply then category will be category object id 1
+category = models.ForeignKey(Category, on_delete = models.CASCADE, default = 1)
