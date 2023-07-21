@@ -1,3 +1,4 @@
+1.
 #update object
 from django.db.models.signals import pre_save
 
@@ -26,3 +27,15 @@ def on_create_ticket(sender, instance, created, **kwargs):
 def on_delete_ticket(sender, instance, **kwargs):
 	# Do something when an object is deleted
 	print("Object deleted:", instance)
+
+
+2.#add ready function in tickets app 
+
+from django.apps import AppConfig
+
+class TicketsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'tickets'
+
+    def ready(self):
+        import tickets.signals
