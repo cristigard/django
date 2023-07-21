@@ -1,0 +1,28 @@
+#update object
+from django.db.models.signals import pre_save
+
+#create object
+from django.db.models.signals import post_save 
+
+#delete object
+from django.db.models.signals import post_delete
+
+from django.dispatch import receiver
+from .models import Ticket
+
+
+@receiver(pre_save, sender=Ticket)
+def on_change_ticket(sender, instance, **kwargs):
+	# Do something when an object is updated
+	print("Object updated:", instance)
+
+@receiver(post_save, sender=Ticket)
+def on_create_ticket(sender, instance, created, **kwargs):
+	if created:
+		# Do something when an object is created
+		print("Object created:", instance)
+
+@receiver(post_delete, sender=Ticket)
+def on_delete_ticket(sender, instance, **kwargs):
+	# Do something when an object is deleted
+	print("Object deleted:", instance)
