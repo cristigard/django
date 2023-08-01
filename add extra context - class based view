@@ -1,0 +1,12 @@
+rom django.views.generic import DetailView
+from .models import MyModel
+
+class MyModelDetailView(DetailView):
+    model = MyModel
+    template_name = 'myapp/mymodel_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add extra context data
+        context['extra_data'] = 'This is extra data added to the context!'
+        return context
