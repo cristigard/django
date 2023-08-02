@@ -22,7 +22,7 @@ def remove_label(form):
         field.label = ''
     return form
  
-4. add to settings new app:
+4. add to settings like new app:
 'app_name.templatetags.form_filters',
 
 5. in template add code:
