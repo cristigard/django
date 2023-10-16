@@ -1,0 +1,18 @@
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
+
+class CustomUserLoginView(SuccessMessageMixin, auth_views.LoginView):
+	template_name = 'accounts/login.html'
+	form_class = CustomUserLoginForm
+	success_message = "Te-ai autentificat cu success in contul tau."
+
+	def get_success_url(self):
+		return reverse_lazy('index')
+
+
+class CustomUserLogoutView(LoginRequiredMixin, auth_views.LogoutView):
+	next_page = 'index'
+
+	def dispatch(self, request, *args, **kwargs):
+		messages.add_message(request, messages.INFO, 'Successfully logged out.')
+		return super().dispatch(request, *args, **kwargs)
