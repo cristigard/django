@@ -1,3 +1,16 @@
+#SESSION
+#Django identify user by sessionid from cookies (sessionid can be found in table django_session column session_key)
+
+#add data to session (all data stored in session can be found in table django_session column session_data (encoded))
+request.session['user_id'] = 123
+
+#get data from session
+user = request.session['user_id']
+
+#get all data from session
+for key, value in request.session.items():
+    print(f"Key: {key}, Value: {value}")
+
 #get user id from cookie (sessionid)
 def test(request):
     id = request.COOKIES.get('sessionid')
@@ -9,7 +22,7 @@ def test(request):
 
 ----------
 
-#add data to session
+#add seq to session
 #add an empty list or dict to session dict
 request.session['test'] = []
 
