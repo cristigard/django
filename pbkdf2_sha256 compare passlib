@@ -1,0 +1,15 @@
+from passlib.hash import django_pbkdf2_sha256 as handler
+
+1.
+# Compare django DB password vs plain password
+password = "gigibecali"
+hash_password = 'pbkdf2_sha256$600000$nYhkvUCALjVuuf9A4VvyfA$TuP6GI/ba5a4T0WQRIJoAb5PRIDxrJh/wix9vhz+7BA=' -> from django DB
+print(handler.verify("gigibecali", hash_password))
+  
+OR
+  
+2. Create a password like django uses in DB
+# Specify the number of iterations
+iterations = 600000
+# Hash the password with the specified iterations
+hashed_password = handler.using(rounds=iterations).hash(password)
