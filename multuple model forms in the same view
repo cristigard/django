@@ -1,0 +1,54 @@
+1.views
+def invoice_view(request):
+
+    if request.method == 'GET':
+        
+        invoices_forms_suppliers = [] #list with tuple to render in template
+        
+            supplier_instance = Supplier.objects.filter(name=inv[0])
+            invoice_instance = Invoice.objects.filter(invoice_file_path=file_name).first()
+            form_instance = InvoiceCommentForm(instance=invoice_instance)
+            invoices_forms_suppliers.append((invoice_instance, form_instance, supplier_instance))
+
+        return render(request, 'invoices/index.html', context={'invoices_forms_suppliers': invoices_forms_suppliers})
+
+    elif request.method == 'POST':
+        
+        form = InvoiceCommentForm(request.POST)
+        if form.is_valid():
+            inv = Invoice.objects.filter(invoice_file_path=request.POST.get('invoice_path')).first()
+            inv.comment = form.cleaned_data['comment']
+            inv.validated = form.cleaned_data['validated']
+            inv.save()
+            return redirect('index')
+    return render(request, 'invoices/index.html', {'form': form})
+2.template
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">File</th>
+            <th scope="col">File Name</th>
+            <th scope="col">Furnizor</th>
+            <th scope="col">Validated</th>
+            <th scope="col">Comment</th>
+            <th scope="col">Change status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice, form, supplier in invoices_forms_suppliers %}
+            <tr>
+                <td><a href="{% static 'invoices/'|add:invoice.invoice_file_path %}" target="_blank">View PDF</a></td>
+                <td>{{ invoice.invoice_file_path }}</td>
+                <td>{{ supplier.name }}</td>
+                    <form method="post">
+                        {% csrf_token %}
+                        <td>{{ form.validated }}</td>
+                        <td>{{ form.comment }}</td>
+                        <input type="hidden" name="invoice_path" value="{{ invoice.invoice_file_path }}">
+                        <td><button class="btn btn-primary btn-sm" type="submit">Validate</button></td>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
