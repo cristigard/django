@@ -1,0 +1,53 @@
+Django PRO Tip: Using F() Expressions correctly:
+--> To Avoid Race Conditions, and;
+--> For Efficient Bulk Updates
+
+
+Today's PRO Tip was requested following last week's Tip which looked at Q() objects.
+
+As with Q() objects, many Django developers get confused when they first encounter F() expressions.
+
+This PRO Tip and selection of snippets aim to clarify what F() expressions are, how & why to use them, and highlight common pitfalls to be mindful of.
+
+
+WHAT ARE F() EXPRESSIONS:
+At the simplest level, an F() expression represents an object's actual database-level value of a field, inside the Django model instance of the object.
+
+This is a complex idea, so let's unpack it.
+
+In Django, when we execute:
+  instance = Model.objects.get(id=123)
+We are loading into Python memory a class-based representation of a single 'row' in our database (i.e. the row from the table that corresponds to our model, and the row we load is the one with the column that has an id field equal to 123).
+
+This means that our Python instance is loaded with whatever values were in the database **at the point of access**.
+
+Now 9 times out of 10, this is not an issue! But sometimes, it can be...
+
+
+HOW AND WHY TO USE F() EXPRESSIONS:
+Imagine you are dealing with a scenario where multiple applications are writing to your database at the same time (e.g. a bank account application).
+
+It is entirely possible that in the time between you:
+-> Loading your Django object into memory,
+-> Performing whatever operations you do to it, and then
+-> Saving your changes to the database
+
+That another process has written to the database, changing the correct value of the relevant row for your object in the database.
+
+This is a 'Race Condition', which can be disastrous in several situations, including those that increment or decrement based on existing values (such as in today's snippet).
+
+To avoid this, we use the F() expression. This 'offloads' the increment/decrement operation to the database.
+
+This avoids the Race Condition, because when Django performs the 'save' method on your object, it converts the F() expression into the relevant SQL code to perform your operation **at the database level**, i.e. using the latest value in the database at the point of saving (not the value in memory).
+
+For a similar reason, F() expressions can make bulk updates much faster, because it means we don't have to load all our objects into Python memory and then loop through them, and instead 'offload' the work to SQL. This is Snippet #3 today, combining an F() expression with the .update() method.
+
+
+COMMON PITFALLS:
+1. F() expressions persist, so after you use them be **very careful** about calling .save() on your instances again without refreshing.
+
+2. F() expressions do not represent a 'usable' value in your instance in terms of standard functionality (i.e. if trying to represent them in a template).
+
+You can usually fix both these issues by calling:
+  instance.refresh_from_db()
+ after your .save() method.
