@@ -2,6 +2,8 @@
 #Django identify user by sessionid from cookies (sessionid can be found in table django_session column session_key)
 
 #add data to session (all data stored in session can be found in table django_session column session_data (encoded))
+#use ONLY string object as key, keep in mint data sessions are stored in json format and can use as values only the json accepted data type's
+
 request.session['user_id'] = 123
 
 #get data from session
@@ -12,6 +14,7 @@ for key, value in request.session.items():
     print(f"Key: {key}, Value: {value}")
 
 #get user id from cookie (sessionid)
+from django.contrib.sessions.backends.db import SessionStore
 def test(request):
     id = request.COOKIES.get('sessionid')
     session = SessionStore(session_key=id)
@@ -20,6 +23,11 @@ def test(request):
     print(user_id)
     return render(request, 'test.html')
 
+#get all data from session
+    if request.method == 'GET':
+        all_session_data = dict(request.session)
+        for key, value in all_session_data.items():
+            print(key, value)
 ----------
 
 #add seq to session
