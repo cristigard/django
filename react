@@ -1,0 +1,14 @@
+#not working in shared folder! use ~/ or other path
+
+1. #install node and npm in ubuntu
+sudo apt install nodejs npm
+
+2.#install react + all 
+npm init -y
+npm i webpack webpack-cli --save-dev
+npm i @babel/core babel-loader @babel/preset-env @babel/preset-react --save-dev
+npm i react react-dom --save-dev
+npm install @material-ui/core
+npm install @babel/plugin-proposal-class-properties
+npm install react-router-dom
+npm install @material-ui/icons
