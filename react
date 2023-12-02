@@ -1,7 +1,8 @@
 #not working in shared folder! use ~/ or other path
 
 1. #install node and npm in ubuntu
-sudo apt install nodejs npm
+sudo apt install nodejs
+sudo apt install npm
 
 2.#install react + all 
 npm init -y
