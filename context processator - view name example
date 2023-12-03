@@ -1,0 +1,30 @@
+
+1. #views
+def some_view(request):
+  return render...
+  
+2. #app_name/context_processors.py
+def get_view_name(request): #can be other func name
+    if request.resolver_match.url_name == 'some_view':
+      view_name = 'some_view'
+    elif:
+      #other view name
+    return {'view_name': view_name}
+
+3. #settings.py
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                # other context processors
+                'yourapp.context_processors.get_view_name',
+            ],
+        },
+    },
+]
+
+4. index.html
+            {{view_name}}
