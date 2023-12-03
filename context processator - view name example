@@ -1,3 +1,4 @@
+#send some dynamic data in template
 
 1. #views
 def some_view(request):
@@ -8,7 +9,7 @@ def get_view_name(request): #can be other func name
     if request.resolver_match.url_name == 'some_view':
       view_name = 'some_view'
     elif:
-      #other view name
+      ... #other view name
     return {'view_name': view_name}
 
 3. #settings.py
