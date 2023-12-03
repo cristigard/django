@@ -27,4 +27,4 @@ TEMPLATES = [
 ]
 
 4. index.html
-            {{view_name}}
+{{view_name}}
