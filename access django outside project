@@ -1,0 +1,25 @@
+#example of use django ORM outside django project
+https://docs.djangoproject.com/en/4.2/topics/settings/
+
+1.create a insert_invoice.py script
+import os
+import django
+
+# Set the DJANGO_SETTINGS_MODULE environment variable to point to your settings module.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "salis_accounting.settings")
+
+#load settings and populate Django’s application registry
+django.setup()
+
+from invoices.models import Invoice
+def insert_invoice(invoice_file_path):
+    try:
+      invoice = Invoice.objects.create(
+                invoice_file_path=invoice_file_path
+            )
+    except Exception as e:
+        print(f"Error inserting invoice: {e}")
+
+insert_invoice('path33.pdf')
+
+2.pyhton insert_invoice.py
