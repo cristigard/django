@@ -1,0 +1,15 @@
+from django.shortcuts import render, redirect
+from .forms import SupplierForm
+
+def add_supplier_view(request, name):
+    if request.method == 'POST':
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('success_page')  # Redirect to a success page
+    else:
+        # Provide initial data to prepopulate the form with the 'name' value
+        initial_data = {'name': name}
+        form = SupplierForm(initial=initial_data)
+
+    return render(request, 'your_app_name/supplier_form.html', {'form': form})
