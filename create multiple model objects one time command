@@ -1,0 +1,11 @@
+from myapp.models import MyModel
+
+# Create a list of MyModel objects
+objects_to_create = [
+    MyModel(name='Object 1'),
+    MyModel(name='Object 2'),
+    MyModel(name='Object 3'),
+]
+
+# Use bulk_create to insert the objects into the database
+MyModel.objects.bulk_create(objects_to_create)
