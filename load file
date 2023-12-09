@@ -1,0 +1,4 @@
+file_name in sthe same as manage.py
+from django.conf import settings
+
+data_file  = setting.BASE_DIR / 'data' / 'file_name'/
