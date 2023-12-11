@@ -1,0 +1,9 @@
+#button to perform get method with parpams
+<button
+   class="btn btn-primary btn-sm"
+    type="button"
+    hx-get="{% url 'get_content' %}"
+    hx-target="#additional-content"
+    hx-vals='{"name": "example_name", "test": "test val ceva", "io": 10999}'>
+    Click Me
+</button>
