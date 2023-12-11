@@ -1,0 +1,24 @@
+1.python -m pip install django-htmx
+
+2.INSTALLED_APPS = [
+  'django.middleware.common.CommonMiddleware',
+   django_htmx.middleware.HtmxMiddleware',
+   'django.middleware.csrf.CsrfViewMiddleware',
+]
+
+3.for django csrf to work select one option or all if you want:
+3.1 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+       ...
+    </body>
+3.2 <form id="myForm" method="post" hx-post="{% url 'your_view_name' %}" hx-headers="{ 'X-CSRFToken': '{{ csrf_token }}' }">
+      {% csrf_token %}
+      <input type="submit" value="Submit">
+    </form>
+
+4.get request htmx
+def my_view(request):
+    if request.htmx:
+        template_name = "partial.html"
+    else:
+        template_name = "complete.html"
+    return render(template_name, ...)
