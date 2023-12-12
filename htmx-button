@@ -3,7 +3,7 @@
    class="btn btn-primary btn-sm"
     type="button"
     hx-get="{% url 'get_content' %}"
-    hx-target="#additional-content"
+    hx-target="#additional-content" -> if not find in page, dont send request!!!
     hx-vals='{"name": "example_name", "test": "test val ceva", "io": 10999}'>
     Click Me
 </button>
