@@ -1,4 +1,5 @@
 #send some dynamic data in template
+FUNCTION MUST RETURN SOMETHIG IF NOT BLOCK VIEW ON CONTEXT
 
 1. #views
 def some_view(request):
