@@ -1,0 +1,17 @@
+#models
+class Contract(models.Model):
+    name = models.CharField(max_length=50, unique=True,verbose_name='Furnizor')
+    no = models.CharField(max_length=20,verbose_name='Contract')
+    
+#view
+class DeleteContractView(SuccessMessageMixin, DeleteView):
+    model = Contract
+    template_name = 'invoices/recurrent_delete.html'
+    pk_url_kwarg = 'pk'
+    success_url = reverse_lazy('list-recurrent')
+    success_message = "Contractul '{object_name} - {object_no}' a fost sters cu success!"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message.format(object_name=str(self.object.name), object_no = str(self.object.no))
+
+        
