@@ -1,0 +1,57 @@
+#SELECT_RELATED(is used to retrieve related objects for a ForeignKey or OneToOneField in a single query)
+# models.py
+from django.db import models
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+# views.py
+1.all()
+books = Book.objects.all()
+for book in books:
+    # This triggers a separate query for each book's author
+    author = book.author
+    print(f"Book: {book.title}, Author: {author.name}")
+
+2.select_related
+books = Book.objects.select_related('author').all()
+for book in books:
+    # No additional queries are triggered for accessing the author
+    author = book.author
+    print(f"Book: {book.title}, Author: {author.name}")
+
+--------------------------
+
+#PREFETCH_RELATED (is used to retrieve related objects for a ForeignKey, OneToOneField, or ManyToManyField)
+# models.py
+from django.db import models
+
+class Genre(models.Model):
+    name = models.CharField(max_length=100)
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    genres = models.ManyToManyField(Genre)
+
+# views.py
+1.all()
+books = Book.objects.all()
+
+for book in books:
+    # This triggers a separate query for each book's genres
+    genres = book.genres.all()
+    print(f"Book: {book.title}, Genres: {', '.join(genre.name for genre in genres)}")
+
+2.prefetch_related
+# Using prefetch_related for ManyToManyField
+books = Book.objects.prefetch_related('genres').all()
+
+
+
+
+
+
