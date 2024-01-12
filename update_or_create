@@ -1,0 +1,23 @@
+#models.py
+class SpvInvoice(models.Model):
+    spv_invoice_id = models.CharField(max_length=20, primary_key = True) #-> must have an primary identificator , django identify if is exist will update if not will create
+    cif = models.CharField(max_length=20, null = True)
+    name = models.CharField(max_length=50, null = True)
+    no = models.CharField(max_length=30, null = True)
+    invoice_type = models.CharField(max_length=30,null = True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null = True)
+    currency = models.CharField(max_length=10, null = True)
+    issue_date = models.DateField(null = True)
+    due_date = models.DateField(null = True)
+
+views.py(
+invoice = SpvInvoice.objects.update_or_create(spv_invoice_id = invoice_data['spv_invoice_id'], #-> look up for the identificator value, all other fileds must be a dict wiht default name
+                                                                defaults ={'cif' : invoice_data['cif'], 
+                                                                        'name' : invoice_data['name'],
+                                                                        'no' : invoice_data['no'],
+                                                                        'invoice_type' : invoice_data['invoice_type'],
+                                                                        'price' : invoice_data['price'],
+                                                                        'currency' : invoice_data['currency'],
+                                                                        'issue_date' : invoice_data['issue_date'],
+                                                                        'due_date' : invoice_data['due_date']
+                                                                })    
