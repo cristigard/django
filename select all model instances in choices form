@@ -1,4 +1,4 @@
-#select all instances from model in form choices by the current user queryset 
+#select all instances from model in form choices by the relation of current user 
 
 #models.py
 class Company(models.Model):
@@ -14,7 +14,7 @@ class AuthorizationForm(forms.Form):
             
     company = forms.ModelChoiceField(
             queryset=Company.objects.none(),
-            label='Selecteaza CIF',
+            label='CIF',
             empty_label=None
         )
     def __init__(self, *args, user=None, **kwargs):
