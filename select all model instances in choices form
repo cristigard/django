@@ -1,0 +1,27 @@
+#select all instances from model in form choices by the current user queryset 
+
+#models.py
+class Company(models.Model):
+    owners = models.ManyToManyField(get_user_model())
+    cif = models.IntegerField(verbose_name='CIF', unique = True)
+    name = models.CharField(max_length = 30, verbose_name='Denumire', unique = True)
+
+    def __str__(self):
+        return str(self.cif)
+
+#froms.py       
+class AuthorizationForm(forms.Form):
+            
+    company = forms.ModelChoiceField(
+            queryset=Company.objects.none(),
+            label='Selecteaza CIF',
+            empty_label=None
+        )
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['company'].queryset = Company.objects.filter(owners=user)
+
+#views
+if request.method == 'GET':
+    authorization_form = AuthorizationForm(user = request.user) <- add user instance to form to be processed in __init__
