@@ -1,0 +1,16 @@
+#models.py
+class Company(models.Model):
+    owners = models.ManyToManyField(get_user_model())
+    cif = models.IntegerField(verbose_name='CIF', unique = True)
+    name = models.CharField(max_length = 30, verbose_name='Denumire', unique = True)
+
+    def __str__(self):
+        return str(self.cif)
+
+#froms.py       
+class AuthorizationForm(forms.Form):
+        company = forms.ModelChoiceField(
+            queryset=Company.objects.all(),
+            label='Select Company',
+            empty_label=None
+        )
