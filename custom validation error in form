@@ -1,0 +1,4 @@
+            if authorization_form.is_valid():
+
+                if CodeIdentifier.objects.filter(cif = authorization_form.cleaned_data['cif'].cif).exists():
+                    authorization_form.add_error('cif', 'Codul CIF selectat este autorizat deja!') 
