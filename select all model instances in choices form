@@ -10,18 +10,21 @@ class Company(models.Model):
         return str(self.cif)
 
 #froms.py       
+#form with company chioces by request user as owner
 class AuthorizationForm(forms.Form):
-            
-    company = forms.ModelChoiceField(
-            queryset=Company.objects.none(),
-            label='CIF',
-            empty_label=None
-        )
+    companies = forms.ModelChoiceField(
+        queryset=Company.objects.none(),
+        label='CIF',
+        empty_label=None
+    )
+
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['company'].queryset = Company.objects.filter(owners=user)
-
+            self.fields['companies'].queryset = Company.objects.filter(owners=user)
 #views
 if request.method == 'GET':
     authorization_form = AuthorizationForm(user = request.user) <- add user instance to form to be processed in __init__
+    
+elif request.method == 'POST':
+    authorization_form = AuthorizationForm(request.POST, user = request.user)
