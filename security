@@ -1,2 +1,28 @@
-#CSP 
+#check security
+https://securityheaders.com/
+
+#1. CSP 
 https://www.digitalocean.com/community/tutorials/how-to-secure-your-django-application-with-a-content-security-policy#step-5-working-with-inline-scripts-and-styles
+MIDDLEWARE = [
+    'csp.middleware.CSPMiddleware', #add it first
+    ...]
+
+CSP_IMG_SRC = ("'self'", "data:")
+CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com/')
+CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com/')
+CSP_SCRIPT_SRC = ("'self'","https://cdn.jsdelivr.net/")
+CSP_INCLUDE_NONCE_IN = ['script-src']
+
+
+#2. ssl, cookies, session
+CSRF_COOKIE_NAME = '__Secure-csrf'
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_NAME = '__Secure-sess'
+SESSION_COOKIE_HTTPONLY = True    
+SESSION_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 2592000
+SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = True
+
