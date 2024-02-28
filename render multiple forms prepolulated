@@ -1,0 +1,88 @@
+#models.py
+class SpvInvoiceRetriveError(models.Model):
+    invoice_id = models.CharField(max_length=100, primary_key = True)
+    updated_at = models.DateTimeField(auto_now=True)
+    identifier = models.CharField(max_length=100)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    error = models.TextField()
+    visibile = models.BooleanField(default=False)
+
+#forms.py
+class SpvInvoiceRetriveErrorForm(forms.ModelForm):
+    class Meta:
+        model = SpvInvoiceRetriveError
+        fields = '__all__'
+
+#view.py
+def spv_invoices_retrive_error_view(request):
+
+    spv_invoice_errors = SpvInvoiceRetriveError.objects.filter(company = 123)
+
+    if request.method == 'GET':
+        forms = [SpvInvoiceRetriveErrorForm(instance=error, prefix=error.invoice_id) for error in spv_invoice_errors]
+
+        return render(request, 'spv/error_list.html', {'forms': forms})
+
+    elif request.method == 'POST':
+
+        valid_forms = []
+
+        for error in spv_invoice_errors:
+            form = SpvInvoiceRetriveErrorForm(request.POST, instance=error, prefix=error.invoice_id)
+            if form.is_valid():
+                valid_forms.append(form)
+
+        # Save all the valid forms
+        for form in valid_forms:
+            form.save()
+
+    return redirect('spv-errors')
+
+#template
+                  <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                            <div class="mb-2 mb-md-0 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h4 class="m-0 font-weight-bold text-primary">Erori actualizare</h4>
+                                </div>
+                            </div>
+
+                        </div>
+                        <form method="POST">
+                        {% csrf_token %}
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="10">
+                                        <thead>
+                                            <tr>
+                                                <th class ='text-center'>Companie</th>
+                                                <th class ='text-center'>Id factura</th>
+                                                <th class ='text-center'>Id incarcare</th>
+                                                <th class ='text-center'>Data / Ora</th>
+                                                <th class ='text-center'>Eroare</th>
+                                                <th class ='text-center'>Vizualizat</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for form in forms %}
+                                                <tr>
+                                                    <td class ='text-center'>{{form.instance.company}}</td>
+                                                    <td class ='text-center'>{{form.instance.invoice_id}}</td>
+                                                    <td class ='text-center'>{{form.instance.identifier}}</td>
+                                                    <td class ='text-center'>{{form.instance.updated_at}}</td>
+                                                    <td class ='text-center'>{{form.instance.error}}</td>
+                                                    <td class ='text-center'>{{form.visibile}}</td> 
+                                                </tr> 
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            
+                            <div class="align-items-center d-flex justify-content-end mt-2">
+                                <button class="btn btn-primary btn-sm" type="submit">Salveaza</button>
+                            </div>
+                        </div>
+                        </form>                       
+                    </div>
+                 
