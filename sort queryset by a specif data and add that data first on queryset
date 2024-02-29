@@ -1,0 +1,4 @@
+
+# Get all companies owned by the user and add first company.cif
+queryset = Company.objects.filter(owners=user).annotate(relevancy=Count(Case(When(cif=company.cif, then=1)))).order_by('-relevancy')
+
