@@ -105,7 +105,27 @@ and inside company_invoice_auto_update.py have the task function)
 
 CELERY_IMPORTS = ("company_invoice_auto_update", )
 
+#add app.conf.update(
+    CELERY_IMPORTS=("company_invoice_auto_update", ),
+)
+from __future__ import absolute_import, unicode_literals
+import os
+from celery import Celery
 
+os.environ.setdefault(
+    'DJANGO_SETTINGS_MODULE', 
+    'spv_project.settings'
+)
+
+app = Celery('spv_project')
+
+app.config_from_object('django.conf:settings', namespace='CELERY')
+
+app.conf.update(
+    CELERY_IMPORTS=("company_invoice_auto_update", ),
+)
+
+app.autodiscover_tasks()
 
 
 
