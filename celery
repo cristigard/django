@@ -1,0 +1,119 @@
+#config
+/etc/systemd/system/celery.service
+
+[Unit]
+Description=Celery Service
+After=network.target
+
+[Service]
+Type=forking
+User=cristi
+Group=cristi
+
+EnvironmentFile=/etc/conf.d/celery
+WorkingDirectory=/mnt/hgfs/shared/spv_project
+ExecStart=/home/cristi/env/spv/bin/celery multi start w1 \
+  -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+  --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}
+ExecStop=/home/cristi/env/spv/bin/celery multi stopwait w1 \
+  --pidfile=${CELERYD_PID_FILE}
+ExecReload=/home/cristi/env/spv/bin/celery multi restart w1 \
+  -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+  --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}
+
+[Install]
+WantedBy=multi-user.target
+
+
+  
+#config
+/etc/conf.d/celery
+# Name of nodes to start
+# here we have a single node
+#CELERYD_NODES="w1"
+CELERYD_NODES="w1 w2 w3"
+# or we could have three nodes:
+#CELERYD_NODES="w1 w2 w3"
+
+# Absolute or relative path to the 'celery' command:
+CELERY_BIN="/usr/local/bin/celery"
+#CELERY_BIN="/virtualenvs/def/bin/celery"
+
+# App instance to use
+# comment out this line if you don't use an app
+CELERY_APP="spv_project.celery:app"
+# or fully qualified:
+#CELERY_APP="proj.tasks:app"
+
+# How to call manage.py
+CELERYD_MULTI="multi"
+
+# Extra command-line arguments to the worker
+CELERYD_OPTS="--time-limit=300 --concurrency=8"
+
+# - %n will be replaced with the first part of the nodename.
+# - %I will be replaced with the current child process index
+#   and is important when using the prefork pool to avoid race conditions.
+CELERYD_PID_FILE="/var/run/celery/%n.pid"
+CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
+CELERYD_LOG_LEVEL="INFO"
+
+# you may wish to add these options for Celery Beat
+#CELERYBEAT_PID_FILE="/var/run/celery/beat.pid"
+#CELERYBEAT_LOG_FILE="/var/log/celery/beat.log"
+
+  
+
+#__init__.py (from 
+from .celery import app as celery_app
+__all__ = ('celery_app',)
+
+#celery.py (in the same dir with settings)
+from __future__ import absolute_import, unicode_literals
+import os
+from celery import Celery
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'spv_project.settings')
+app = Celery('spv_project')
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks() 
+
+#settings.py
+#CELERY
+CELERY_BROKER_URL = f"redis://:{os.environ.get('redis_pass')}@127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = f"redis://:{os.environ.get('redis_pass')}@127.0.0.1:6379/0"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+#views.py
+from spv_project import celery_app
+
+@celery_app.task
+def test():
+  #do something
+
+def action():
+  #start async func
+  test.delay()
+
+
+#if want to use celery to do some other task not in project like views and give error: 
+#[2024-03-04 15:28:10,042: ERROR/MainProcess] Received unregistered task of type 'spv_project.test'.
+#The message has been ignored and discarded.
+#add where task is located (company_invoice_auto_update is located at project level, same a manage.py
+and inside company_invoice_auto_update.py have the task function)
+#settings.py
+
+CELERY_IMPORTS = ("company_invoice_auto_update", )
+
+
+
+
+
+
+
+
+
+
+
+
+  
