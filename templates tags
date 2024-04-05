@@ -1,0 +1,7 @@
+#get item as variabile
+1.
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+2.
+{{contracts|get_item:form.instance.cif}}
