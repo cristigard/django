@@ -1,4 +1,7 @@
-                        {% if page_obj.object_list %}
+
+{{forloop.counter0|add:page_obj.start_index}} -> for table item no
+
+{% if page_obj.object_list %}
                             <div class="pagination-container mt-1">
                                 <ul class="pagination justify-content-end m-0">
                                     {% if page_obj.has_previous %}
