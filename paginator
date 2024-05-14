@@ -1,0 +1,36 @@
+                        {% if page_obj.object_list %}
+                            <div class="pagination-container mt-1">
+                                <ul class="pagination justify-content-end m-0">
+                                    {% if page_obj.has_previous %}
+                                        <li class="paginate_button page-item next enabled" id="dataTable_next">
+                                            <a href="{% url 'spv-invoices-page' 1 %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">First</a>
+                                        </li>
+
+                                        <li class="paginate_button page-item previous enabled" id="dataTable_previous">
+                                            <a href="{% url 'spv-invoices-page' page_obj.previous_page_number %}" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if page_obj.paginator.count > 10 %}
+                                        {% for num in page_obj.paginator.page_range %}
+                                            {% if page_obj.number == num %}
+                                            <li class="paginate_button page-item active">
+                                               <a href="{% url 'spv-invoices-page' num %}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">{{num}}</a>
+                                            </li>
+                                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                            <li class="paginate_button page-item">
+                                              <a href="{% url 'spv-invoices-page' num %}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">{{num}}</a>
+                                            </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if page_obj.has_next %}
+                                        <li class="paginate_button page-item next" id="dataTable_next">
+                                            <a href="{% url 'spv-invoices-page' page_obj.next_page_number %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Next</a>
+                                        </li>
+                                        <li class="paginate_button page-item next" id="dataTable_next">
+                                            <a href="{% url 'spv-invoices-page' page_obj.paginator.num_pages %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Last</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        {% endif %}
