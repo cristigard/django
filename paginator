@@ -1,39 +1,245 @@
+            invoices_count = SpvInvoice.objects.filter((Q(due_date__year=yr, due_date__month=mo) | Q(due_date__isnull=True)),
+                                                       (Q(cif__icontains=search_spv_form_value) |
+                                                        Q(name__icontains=search_spv_form_value) |
+                                                        Q(no__icontains=search_spv_form_value) |
+                                                        Q(price__icontains=search_spv_form_value)),
+                                                          company=company,
+                                                          invoice_type=filter_spv_form_value,
+                                                          payed=filter_pay_unpay_form_value,
+                                                    ).order_by(sort_spv_form_value).count()
 
-{{forloop.counter0|add:page_obj.start_index}} -> for table item no
+            paginator_count = Paginator(list(range(invoices_count)), 10)
+            page_obj = paginator_count.get_page(page) if page else paginator_count.page(1)
+            invoices_with_row_number = SpvInvoice.objects.filter((Q(due_date__year=yr, due_date__month=mo) | Q(due_date__isnull=True)),
+                                                                 (Q(cif__icontains=search_spv_form_value) |
+                                                                  Q(name__icontains=search_spv_form_value) |
+                                                                  Q(no__icontains=search_spv_form_value) |
+                                                                  Q(price__icontains=search_spv_form_value)),
+                                                                    company=company,
+                                                                    invoice_type=filter_spv_form_value,
+                                                                    payed=filter_pay_unpay_form_value,
+                                                            ).annotate(row_number=Window(
+                                                                       expression=RowNumber(),
+                                                                       order_by=F(sort_spv_form_value).asc()))   
 
-{% if page_obj.object_list %}
-                            <div class="pagination-container mt-1">
-                                <ul class="pagination justify-content-end m-0">
-                                    {% if page_obj.has_previous %}
-                                        <li class="paginate_button page-item next enabled" id="dataTable_next">
-                                            <a href="{% url 'spv-invoices-page' 1 %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">First</a>
-                                        </li>
+            invoices = invoices_with_row_number.filter(row_number__gte=page_obj.start_index(),
+                                                       row_number__lte=page_obj.end_index())                                                                              
+        if invoices:    
+            forms = [SpvInvoicePayForm(instance=invoice, prefix=invoice.invoice_id) for invoice in invoices]
 
-                                        <li class="paginate_button page-item previous enabled" id="dataTable_previous">
-                                            <a href="{% url 'spv-invoices-page' page_obj.previous_page_number %}" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
-                                        </li>
+
+
+#template
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+        <div class="mb-2 mb-md-0 d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="m-0 font-weight-bold text-primary">Facturi SPV</h4>
+            </div>
+            <div class="ml-2">
+                <form method="POST">{% csrf_token %}
+                    <button class="btn btn-sm btn-primary shadow-sm mt-2" type="submit">
+                        <i class="fas fa-download fa-sm text-white-50"></i> Actualizeaza
+                    </button>
+                    <input type="hidden" name="actualizeaza">
+                </form>
+            </div>
+        </div>
+        <div class="d-flex flex-column flex-md-row">
+            <div class="mb-2 mb-md-0 mr-md-2">
+                <form method="POST">{% csrf_token %}
+                    <div id="div-filter-form">
+                        <div id="flx-grow">
+                            {{ sort_spv_form }}
+                        </div>
+                        <div id="btn-filter">
+                            <button class="btn btn-primary btn-sm" type="submit">Sorteaza</button>
+                            <input type="hidden" name="sort_spv_form">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="mb-2 mb-md-0 mr-md-2">
+                <form method="POST">{% csrf_token %}
+                    <div id="div-filter-form">
+                        <div id="flx-grow">
+                            {{ filter_spv_form }}
+                        </div>
+                        <div id="btn-filter">
+                            <button class="btn btn-primary btn-sm" type="submit">Filtreaza</button>
+                            <input type="hidden" name="filter_spv_form">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <form method="POST">{% csrf_token %}
+                    <div id="div-filter-form">
+                        <div id="flx-grow">
+                            {{ filter_pay_unpay_form }}
+                        </div>
+                        <div id="form-button-filter-sort">
+                            <button class="btn btn-primary btn-sm" type="submit">Filtreaza</button>
+                            <input type="hidden" name="filter_spv_form_in_out">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="row">
+                        <div class="col-sm-8 col-md-8 mt-1">
+                            <div class="dataTables_length" id="dataTable_length">
+                                {% if page_obj.paginator.count %} Total {{page_obj.paginator.count}} entries {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-md-4 mb-3 d-flex justify-content-end">
+                            <form method="POST">{% csrf_token %}
+                                <div id="x-button">
+                                    <button class="btn btn-danger btn-sm" type="submit">X</button>
+                                    <input type="hidden" name="spv_close_search_form">
+                                </div>
+                            </form>
+                            <form method="POST">{% csrf_token %}
+                                <div id="div-search-form">
+                                    <div id="flx-grow">
+                                        {{ search_form }}
+                                    </div>
+                                    <div id="form-button-search">
+                                        <button class="btn btn-primary btn-sm" type="submit">Cauta</button>
+                                        <input type="hidden" name="spv_search_form">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <form method="POST">{% csrf_token %}
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="10">
+                    <thead>
+                        <tr><th class='text-center'></th>
+                            <th class='text-center'>PDF</th>
+                            <th class='text-center'>Arhiva ANAF</th>
+                            {% if filter_spv_form_value == 'FACTURA PRIMITA' %}
+                                <th class='text-center'>Furnizor</th>
+                            {% elif filter_spv_form_value == 'FACTURA TRIMISA' %}
+                                <th class='text-center'>Client</th>
+                            {% endif %}
+                            <th class='text-center'>CIF</th>
+                            <th class='text-center'>Nr</th>
+                            <th class='text-center'>Valoare</th>
+                            <th class='text-center'>Moneda</th>
+                            <th class='text-center'>Data emitere</th>
+                            <th class='text-center'>Data scadenta</th>
+                            <th class='text-center'>Platit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if forms %}
+                            {% for form in forms %}
+                                <tr>
+                                    <td class='text-center'>{{forloop.counter0|add:page_obj.start_index}} </td>
+                                    <td class='text-center'>
+                                        <a href="{% url 'spv-view-pdf' invoice_id=form.instance.invoice_id %}" target="_blank">Vezi</a>
+                                    </td>
+                                    <td class='text-center'>
+                                        <a href="{% url 'spv-download-zip' invoice_id=form.instance.invoice_id %}" target="">Descarca</a>
+                                    </td>
+                                    <td class='text-center'>{{form.instance.name}}</td>
+                                    <td class='text-center'>{{form.instance.cif}}</td>
+                                    <td class='text-center'>{{form.instance.no}}</td>
+                                    {% if form.instance.invoice_mod == 'CreditNote' %}
+                                        <td class="text-center text-danger">{{form.instance.price}}</td>
+                                    {% else %}
+                                        <td class='text-center'>{{form.instance.price}}</td>
                                     {% endif %}
-                                    {% if page_obj.paginator.count > 10 %}
-                                        {% for num in page_obj.paginator.page_range %}
-                                            {% if page_obj.number == num %}
-                                            <li class="paginate_button page-item active">
-                                               <a href="{% url 'spv-invoices-page' num %}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">{{num}}</a>
+                                    <td class='text-center'>{{form.instance.currency}}</td>
+                                    <td class='text-center'>{{form.instance.issue_date}}</td>
+                                    {% if form.instance.due_date %}
+                                        <td class='text-center'>{{form.instance.due_date}}</td>
+                                    {% else %}
+                                        <td class='text-center'>-</td>
+                                    {% endif %}
+                                    <td class='text-center'>{{form.payed}}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="odd">
+                                <td valign="top" colspan="11" class="dataTables_empty text-center">No data available in table</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive">
+                <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                    <div class="row mt-0">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="dataTables_length" id="dataTable_length">
+                                {% if page_obj.paginator.count %} Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} {% endif %}
+                                
+                            </div>
+                        </div>
+                        {% if page_obj.object_list %}
+                            <div class="col-sm-12 col-md-6">
+                                <div id="dataTable_filter" class="dataTables_filter">
+                                    <ul class="pagination justify-content-end m-0">
+                                        {% if page_obj.has_previous %}
+                                            <li class="paginate_button page-item next enabled" id="dataTable_next">
+                                                <a href="{% url 'spv-invoices-page' 1 %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">First</a>
                                             </li>
-                                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                            <li class="paginate_button page-item">
-                                              <a href="{% url 'spv-invoices-page' num %}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">{{num}}</a>
+                                            <li class="paginate_button page-item previous enabled" id="dataTable_previous">
+                                                <a href="{% url 'spv-invoices-page' page_obj.previous_page_number %}" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a>
                                             </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                    {% if page_obj.has_next %}
-                                        <li class="paginate_button page-item next" id="dataTable_next">
-                                            <a href="{% url 'spv-invoices-page' page_obj.next_page_number %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Next</a>
-                                        </li>
-                                        <li class="paginate_button page-item next" id="dataTable_next">
-                                            <a href="{% url 'spv-invoices-page' page_obj.paginator.num_pages %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Last</a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
+                                        {% endif %}
+                                        {% if page_obj.paginator.count > 10 %}
+                                            {% for num in page_obj.paginator.page_range %}
+                                                {% if page_obj.number == num %}
+                                                    <li class="paginate_button page-item active">
+                                                        <a href="{% url 'spv-invoices-page' num %}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">{{num}}</a>
+                                                    </li>
+                                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                                    <li class="paginate_button page-item">
+                                                        <a href="{% url 'spv-invoices-page' num %}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">{{num}}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="align-items-center d-flex justify-content-end">
+                                                <button class="btn btn-primary btn-sm" type="submit">Salveaza</button>
+                                                <input type="hidden" name="spv_pay_form">
+                                            </div>
+                                        {% endif %}
+                                        {% if page_obj.has_next %}
+                                            <li class="paginate_button page-item next" id="dataTable_next">
+                                                <a href="{% url 'spv-invoices-page' page_obj.next_page_number %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Next</a>
+                                            </li>
+                                            <li class="paginate_button page-item next" id="dataTable_next">
+                                                <a href="{% url 'spv-invoices-page' page_obj.paginator.num_pages %}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Last</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
                             </div>
                         {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if page_obj.paginator.count > 10 %}
+                <div class="align-items-center d-flex justify-content-end mt-3">
+                    <button class="btn btn-primary btn-sm" type="submit">Salveaza</button>
+                    <input type="hidden" name="spv_pay_form">
+                </div>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% endblock %}
