@@ -1,0 +1,49 @@
+import os
+import django
+import uuid
+from faker import Faker
+
+# Set up Django environment
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'netopia.settings')
+django.setup()
+
+
+from users.models import CustomUser as User
+
+# Initialize Faker
+fake = Faker()
+
+# Number of users to create
+NUM_USERS = 1000
+
+def create_users():
+    print(f"Starting to create {NUM_USERS} users...")
+    batch_size = 100 # Create users in batches to avoid memory issues
+    
+    for i in range(0, NUM_USERS, batch_size):
+        users = []
+        email_set = set()  # Keep track of email addresses to ensure uniqueness
+        
+        for _ in range(batch_size):
+            email = fake.email()
+            # Ensure email is unique
+            while email in email_set:
+                email = fake.email()
+            email_set.add(email)
+            
+            users.append(User(
+                username=str(uuid.uuid4()),  # Generate unique username using UUID
+                first_name=fake.first_name(),  # Generate random first name
+                last_name=fake.last_name(),  # Generate random last name
+                email=email,  # Ensure email uniqueness
+                password=User.objects.make_random_password()  # Generate random password
+            ))
+
+        try:
+            User.objects.bulk_create(users)
+            print(f"Created {i + batch_size} users")
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
+if __name__ == "__main__":
+    create_users()
